@@ -1,20 +1,37 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import { supabase } from '../../lib/supabase'
 import Navbar from '../../components/Navbar'
 
 export default function Blog() {
+  const [posts, setPosts] = useState<any[]>([])
+
+  useEffect(() => {
+    getPosts()
+  }, [])
+
+  async function getPosts() {
+    const { data } = await supabase
+      .from('posts')
+      .select('*')
+      .eq('visibility', 'public')
+      .order('id', { ascending: false })
+
+    if (data) {
+      setPosts(data)
+    }
+  }
+
   return (
     <main>
       <Navbar />
 
-      <section
-        style={{
-          padding: '50px',
-        }}
-      >
+      <section style={{ padding: '40px' }}>
         <h1
           style={{
             fontSize: '50px',
             color: '#2ecc71',
-            marginBottom: '40px',
           }}
         >
           Blog Public
@@ -22,17 +39,47 @@ export default function Blog() {
 
         <div
           style={{
-            background: '#1a1a1a',
-            padding: '30px',
-            borderRadius: '20px',
-            marginBottom: '20px',
+            display: 'grid',
+            gap: '30px',
+            marginTop: '40px',
           }}
         >
-          <h2>Premier Article</h2>
+          {posts.map((post) => (
+            <div
+              key={post.id}
+              style={{
+                background: '#1a1a1a',
+                padding: '30px',
+                borderRadius: '20px',
+              }}
+            >
+              <h2>{post.title}</h2>
 
-          <p style={{ color: '#aaa' }}>
-            Accessible à tous les visiteurs.
-          </p>
+              <p>{post.content}</p>
+
+              {post.image_url && (
+                <img
+                  src={post.image_url}
+                  style={{
+                    width: '100%',
+                    borderRadius: '20px',
+                    marginTop: '20px',
+                  }}
+                />
+              )}
+
+              {post.youtube_url && (
+                <iframe
+                  width='100%'
+                  height='400'
+                  src={post.youtube_url.replace(
+                    'watch?v=',
+                    'embed/'
+                  )}
+                />
+              )}
+            </div>
+          ))}
         </div>
       </section>
     </main>
