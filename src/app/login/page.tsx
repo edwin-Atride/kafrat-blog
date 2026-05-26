@@ -2,16 +2,29 @@
 
 import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
+import { useRouter } from 'next/navigation'
 
 export default function Login() {
+  const router = useRouter()
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
 
   async function login() {
-    await supabase.auth.signInWithPassword({
+    setError('')
+
+    const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     })
+
+    if (error) {
+      setError(error.message)
+      return
+    }
+
+    router.push('/')
   }
 
   return (
@@ -56,12 +69,13 @@ export default function Login() {
             marginBottom: '30px',
           }}
         >
-          Connexion Adhérant
+          Connexion
         </p>
 
         <input
           type='email'
           placeholder='Email'
+          value={email}
           onChange={(e) => setEmail(e.target.value)}
           style={inputStyle}
         />
@@ -69,9 +83,16 @@ export default function Login() {
         <input
           type='password'
           placeholder='Mot de passe'
+          value={password}
           onChange={(e) => setPassword(e.target.value)}
           style={inputStyle}
         />
+
+        {error && (
+          <p style={{ color: 'red', marginBottom: '20px' }}>
+            {error}
+          </p>
+        )}
 
         <button onClick={login} style={buttonStyle}>
           Se connecter
