@@ -8,32 +8,43 @@ export default function Navbar() {
   const [role, setRole] = useState('')
 
   useEffect(() => {
-    checkUser()
+    getSession()
+
+    supabase.auth.onAuthStateChange(() => {
+      getSession()
+    })
   }, [])
 
-  async function checkUser() {
+  async function getSession() {
     const {
-      data: { user },
-    } = await supabase.auth.getUser()
+      data: { session },
+    } = await supabase.auth.getSession()
 
-    if (!user) return
+    if (!session?.user) {
+      setUser(null)
+      setRole('')
+      return
+    }
 
-    setUser(user)
+    setUser(session.user)
 
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('profiles')
       .select('role')
-      .eq('id', user.id)
+      .eq('id', session.user.id)
       .single()
 
-    if (data) {
+    console.log(data)
+    console.log(error)
+
+    if (data?.role) {
       setRole(data.role)
     }
   }
 
   async function logout() {
     await supabase.auth.signOut()
-    window.location.reload()
+    window.location.href = '/'
   }
 
   return (
@@ -67,12 +78,17 @@ export default function Navbar() {
 
         <a href='/blog'>Blog Public</a>
 
-        {(role === 'adherant' || role === 'admin') && (
-          <a href='/adherant'>Blog Adhérant</a>
+        {(role === 'admin' ||
+          role === 'adherant') && (
+          <a href='/adherant'>
+            Blog Adhérant
+          </a>
         )}
 
         {role === 'admin' && (
-          <a href='/admin'>Dashboard</a>
+          <a href='/admin'>
+            Dashboard
+          </a>
         )}
 
         {!user ? (
