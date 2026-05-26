@@ -1,39 +1,54 @@
-import Navbar from '../../components/Navbar'
+'use client'
+
+import { useEffect, useState } from 'react'
+import { supabase } from '../../lib/supabase'
+import { useRouter } from 'next/navigation'
 
 export default function Adherant() {
+  const router = useRouter()
+
+  const [authorized, setAuthorized] = useState(false)
+
+  useEffect(() => {
+    checkAccess()
+  }, [])
+
+  async function checkAccess() {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+      router.push('/login')
+      return
+    }
+
+    const { data } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    if (
+      data?.role !== 'adherant' &&
+      data?.role !== 'admin'
+    ) {
+      router.push('/')
+      return
+    }
+
+    setAuthorized(true)
+  }
+
+  if (!authorized) {
+    return <h1 style={{ padding: '40px' }}>Chargement...</h1>
+  }
+
   return (
-    <main>
-      <Navbar />
+    <main style={{ padding: '40px' }}>
+      <h1>Blog Adhérant</h1>
 
-      <section
-        style={{
-          padding: '50px',
-        }}
-      >
-        <h1
-          style={{
-            fontSize: '50px',
-            color: '#f1c40f',
-            marginBottom: '40px',
-          }}
-        >
-          Blog Adhérant
-        </h1>
-
-        <div
-          style={{
-            background: '#1a1a1a',
-            padding: '30px',
-            borderRadius: '20px',
-          }}
-        >
-          <h2>Contenu privé</h2>
-
-          <p style={{ color: '#aaa' }}>
-            Visible uniquement pour les adhérants connectés.
-          </p>
-        </div>
-      </section>
+      <p>Contenu privé réservé aux adhérants.</p>
     </main>
   )
 }
