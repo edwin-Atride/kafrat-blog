@@ -11,17 +11,32 @@ export default function Home(){
     justifyContent:'center',
     alignItems:'center',
     flexDirection:'column',
-    textAlign:'center'
+    textAlign:'center',
+    padding:'20px'
    }}>
+
+    <div style={{
+     padding:'10px 20px',
+     border:'1px solid #2ecc71',
+     borderRadius:'50px',
+     background:'rgba(46,204,113,0.2)',
+     marginBottom:'20px'
+    }}>
+     Association Guadeloupéenne
+    </div>
+
     <h1 style={{
      fontSize:'60px',
      color:'#2ecc71'
     }}>
-     Bienvenue chez Kafrat
+     Kafrat
     </h1>
 
-    <p style={{color:'#ccc'}}>
-     Site style dark Guadeloupe avec Supabase.
+    <p style={{
+     maxWidth:'700px',
+     color:'#ccc'
+    }}>
+     Plateforme culturelle moderne avec espace adhérant.
     </p>
    </section>
   </main>
