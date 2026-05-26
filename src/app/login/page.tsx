@@ -14,13 +14,39 @@ export default function Login() {
   async function login() {
     setError('')
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
+    const { error } =
+      await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
 
     if (error) {
       setError(error.message)
+      return
+    }
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+      router.push('/')
+      return
+    }
+
+    const { data } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    if (data?.role === 'admin') {
+      router.push('/admin')
+      return
+    }
+
+    if (data?.role === 'adherant') {
+      router.push('/adherant')
       return
     }
 
@@ -76,7 +102,9 @@ export default function Login() {
           type='email'
           placeholder='Email'
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) =>
+            setEmail(e.target.value)
+          }
           style={inputStyle}
         />
 
@@ -84,17 +112,27 @@ export default function Login() {
           type='password'
           placeholder='Mot de passe'
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) =>
+            setPassword(e.target.value)
+          }
           style={inputStyle}
         />
 
         {error && (
-          <p style={{ color: 'red', marginBottom: '20px' }}>
+          <p
+            style={{
+              color: 'red',
+              marginBottom: '20px',
+            }}
+          >
             {error}
           </p>
         )}
 
-        <button onClick={login} style={buttonStyle}>
+        <button
+          onClick={login}
+          style={buttonStyle}
+        >
           Se connecter
         </button>
       </div>
