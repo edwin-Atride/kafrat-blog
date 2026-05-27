@@ -12,8 +12,11 @@ export default function Admin() {
 
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
-  const [imageUrl, setImageUrl] = useState('')
-  const [youtubeUrl, setYoutubeUrl] = useState('')
+  const [youtubeUrl, setYoutubeUrl] =
+    useState('')
+  const [imageUrl, setImageUrl] =
+    useState('')
+
   const [visibility, setVisibility] =
     useState('adherant')
 
@@ -48,19 +51,39 @@ export default function Admin() {
     setAuthorized(true)
   }
 
+  async function uploadImage(file: File) {
+    const fileName =
+      Date.now() + '-' + file.name
+
+    const { error } = await supabase.storage
+      .from('images')
+      .upload(fileName, file)
+
+    if (error) {
+      alert(error.message)
+      return
+    }
+
+    const { data } = supabase.storage
+      .from('images')
+      .getPublicUrl(fileName)
+
+    setImageUrl(data.publicUrl)
+  }
+
   async function createPost() {
     await supabase.from('posts').insert({
       title,
       content,
-      image_url: imageUrl,
       youtube_url: youtubeUrl,
+      image_url: imageUrl,
       visibility,
     })
 
     setTitle('')
     setContent('')
-    setImageUrl('')
     setYoutubeUrl('')
+    setImageUrl('')
 
     getPosts()
 
@@ -111,39 +134,20 @@ export default function Admin() {
           style={{
             color: '#2ecc71',
             fontSize: '50px',
-            marginBottom: '10px',
           }}
         >
           Dashboard Admin
         </h1>
 
-        <p
-          style={{
-            color: '#aaa',
-            marginBottom: '40px',
-          }}
-        >
-          Création et gestion des articles.
-        </p>
-
         <div
           style={{
             background: '#111',
-            border: '1px solid #2ecc71',
-            borderRadius: '20px',
             padding: '30px',
+            borderRadius: '20px',
+            marginTop: '40px',
             marginBottom: '50px',
           }}
         >
-          <h2
-            style={{
-              color: '#2ecc71',
-              marginBottom: '20px',
-            }}
-          >
-            Créer un article
-          </h2>
-
           <input
             placeholder='Titre'
             value={title}
@@ -166,16 +170,20 @@ export default function Admin() {
           />
 
           <input
-            placeholder='Lien image'
-            value={imageUrl}
-            onChange={(e) =>
-              setImageUrl(e.target.value)
-            }
+            type='file'
+            onChange={(e) => {
+              const file =
+                e.target.files?.[0]
+
+              if (file) {
+                uploadImage(file)
+              }
+            }}
             style={inputStyle}
           />
 
           <input
-            placeholder='Lien vidéo YouTube'
+            placeholder='Lien YouTube'
             value={youtubeUrl}
             onChange={(e) =>
               setYoutubeUrl(e.target.value)
@@ -185,13 +193,11 @@ export default function Admin() {
 
           <label
             style={{
-              display: 'block',
-              marginBottom: '10px',
               color: '#2ecc71',
               fontWeight: 'bold',
             }}
           >
-            Où publier l’article ?
+            Où publier ?
           </label>
 
           <select
@@ -214,18 +220,9 @@ export default function Admin() {
             onClick={createPost}
             style={buttonStyle}
           >
-            Publier l’article
+            Publier
           </button>
         </div>
-
-        <h2
-          style={{
-            color: '#2ecc71',
-            marginBottom: '30px',
-          }}
-        >
-          Articles publiés
-        </h2>
 
         <div
           style={{
@@ -253,29 +250,13 @@ export default function Admin() {
                 {post.content}
               </p>
 
-              <p
-                style={{
-                  marginTop: '20px',
-                  color:
-                    post.visibility ===
-                    'adherant'
-                      ? '#f1c40f'
-                      : '#2ecc71',
-                }}
-              >
-                {post.visibility ===
-                'adherant'
-                  ? '🔒 Article Adhérant'
-                  : '🌍 Article Public'}
-              </p>
-
               {post.image_url && (
                 <img
                   src={post.image_url}
                   style={{
                     width: '100%',
-                    borderRadius: '20px',
                     marginTop: '20px',
+                    borderRadius: '20px',
                   }}
                 />
               )}
@@ -306,7 +287,6 @@ export default function Admin() {
                   padding: '12px 20px',
                   borderRadius: '12px',
                   color: 'white',
-                  cursor: 'pointer',
                 }}
               >
                 Supprimer
