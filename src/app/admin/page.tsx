@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useRouter } from 'next/navigation'
+import Navbar from '../../components/Navbar'
 
 export default function Admin() {
   const router = useRouter()
@@ -13,7 +14,8 @@ export default function Admin() {
   const [content, setContent] = useState('')
   const [imageUrl, setImageUrl] = useState('')
   const [youtubeUrl, setYoutubeUrl] = useState('')
-  const [visibility, setVisibility] = useState('public')
+  const [visibility, setVisibility] =
+    useState('adherant')
 
   const [posts, setPosts] = useState<any[]>([])
 
@@ -55,9 +57,14 @@ export default function Admin() {
       visibility,
     })
 
-    alert('Article créé')
+    setTitle('')
+    setContent('')
+    setImageUrl('')
+    setYoutubeUrl('')
 
     getPosts()
+
+    alert('Article publié')
   }
 
   async function getPosts() {
@@ -81,170 +88,256 @@ export default function Admin() {
   }
 
   if (!authorized) {
-    return <h1 style={{ padding: '40px' }}>Chargement...</h1>
+    return (
+      <h1 style={{ padding: '40px' }}>
+        Chargement...
+      </h1>
+    )
   }
 
   return (
-    <main
-      style={{
-        minHeight: '100vh',
-        background:
-          'linear-gradient(to bottom right,#000,#111,#1b4332)',
-        padding: '40px',
-      }}
-    >
-      <div
+    <>
+      <Navbar />
+
+      <main
         style={{
-          position: 'fixed',
-          right: '20px',
-          bottom: '20px',
-          width: '400px',
-          background: '#111',
-          border: '1px solid #2ecc71',
-          borderRadius: '20px',
-          padding: '20px',
-          zIndex: 1000,
+          minHeight: '100vh',
+          background:
+            'linear-gradient(to bottom right,#000,#111,#1b4332)',
+          padding: '40px',
         }}
       >
-        <h2 style={{ color: '#2ecc71' }}>
-          Dashboard Admin
-        </h2>
-
-        <input
-          placeholder='Titre'
-          onChange={(e) => setTitle(e.target.value)}
-          style={inputStyle}
-        />
-
-        <textarea
-          placeholder='Contenu'
-          onChange={(e) => setContent(e.target.value)}
+        <h1
           style={{
-            ...inputStyle,
-            minHeight: '120px',
+            color: '#2ecc71',
+            fontSize: '50px',
+            marginBottom: '10px',
           }}
-        />
-
-        <input
-          placeholder='Lien image'
-          onChange={(e) => setImageUrl(e.target.value)}
-          style={inputStyle}
-        />
-
-        <input
-          placeholder='Lien YouTube'
-          onChange={(e) => setYoutubeUrl(e.target.value)}
-          style={inputStyle}
-        />
-
-        <select
-          onChange={(e) => setVisibility(e.target.value)}
-          style={inputStyle}
         >
-          <option value='public'>
-            Public
-          </option>
+          Dashboard Admin
+        </h1>
 
-          <option value='adherant'>
-            Adhérant
-          </option>
-        </select>
-
-        <button
-          onClick={createPost}
-          style={buttonStyle}
+        <p
+          style={{
+            color: '#aaa',
+            marginBottom: '40px',
+          }}
         >
-          Publier
-        </button>
-      </div>
+          Création et gestion des articles.
+        </p>
 
-      <h1
-        style={{
-          color: '#2ecc71',
-          fontSize: '50px',
-        }}
-      >
-        Gestion des Blogs
-      </h1>
-
-      <div
-        style={{
-          marginTop: '40px',
-          display: 'grid',
-          gap: '20px',
-        }}
-      >
-        {posts.map((post) => (
-          <div
-            key={post.id}
+        <div
+          style={{
+            background: '#111',
+            border: '1px solid #2ecc71',
+            borderRadius: '20px',
+            padding: '30px',
+            marginBottom: '50px',
+          }}
+        >
+          <h2
             style={{
-              background: '#1a1a1a',
-              padding: '20px',
-              borderRadius: '20px',
+              color: '#2ecc71',
+              marginBottom: '20px',
             }}
           >
-            <h2>{post.title}</h2>
+            Créer un article
+          </h2>
 
-            <p>{post.content}</p>
+          <input
+            placeholder='Titre'
+            value={title}
+            onChange={(e) =>
+              setTitle(e.target.value)
+            }
+            style={inputStyle}
+          />
 
-            {post.image_url && (
-              <img
-                src={post.image_url}
-                style={{
-                  width: '100%',
-                  borderRadius: '20px',
-                  marginTop: '20px',
-                }}
-              />
-            )}
+          <textarea
+            placeholder='Contenu'
+            value={content}
+            onChange={(e) =>
+              setContent(e.target.value)
+            }
+            style={{
+              ...inputStyle,
+              minHeight: '150px',
+            }}
+          />
 
-            {post.youtube_url && (
-              <iframe
-                width='100%'
-                height='400'
-                src={post.youtube_url.replace(
-                  'watch?v=',
-                  'embed/'
-                )}
-              />
-            )}
+          <input
+            placeholder='Lien image'
+            value={imageUrl}
+            onChange={(e) =>
+              setImageUrl(e.target.value)
+            }
+            style={inputStyle}
+          />
 
-            <button
-              onClick={() => deletePost(post.id)}
+          <input
+            placeholder='Lien vidéo YouTube'
+            value={youtubeUrl}
+            onChange={(e) =>
+              setYoutubeUrl(e.target.value)
+            }
+            style={inputStyle}
+          />
+
+          <label
+            style={{
+              display: 'block',
+              marginBottom: '10px',
+              color: '#2ecc71',
+              fontWeight: 'bold',
+            }}
+          >
+            Où publier l’article ?
+          </label>
+
+          <select
+            value={visibility}
+            onChange={(e) =>
+              setVisibility(e.target.value)
+            }
+            style={inputStyle}
+          >
+            <option value='adherant'>
+              🔒 Blog Adhérant
+            </option>
+
+            <option value='public'>
+              🌍 Blog Public
+            </option>
+          </select>
+
+          <button
+            onClick={createPost}
+            style={buttonStyle}
+          >
+            Publier l’article
+          </button>
+        </div>
+
+        <h2
+          style={{
+            color: '#2ecc71',
+            marginBottom: '30px',
+          }}
+        >
+          Articles publiés
+        </h2>
+
+        <div
+          style={{
+            display: 'grid',
+            gap: '30px',
+          }}
+        >
+          {posts.map((post) => (
+            <div
+              key={post.id}
               style={{
-                marginTop: '20px',
-                background: '#e74c3c',
-                border: 'none',
-                padding: '10px 20px',
-                borderRadius: '10px',
-                color: 'white',
+                background: '#1a1a1a',
+                padding: '30px',
+                borderRadius: '20px',
               }}
             >
-              Supprimer
-            </button>
-          </div>
-        ))}
-      </div>
-    </main>
+              <h2>{post.title}</h2>
+
+              <p
+                style={{
+                  color: '#aaa',
+                  marginTop: '15px',
+                }}
+              >
+                {post.content}
+              </p>
+
+              <p
+                style={{
+                  marginTop: '20px',
+                  color:
+                    post.visibility ===
+                    'adherant'
+                      ? '#f1c40f'
+                      : '#2ecc71',
+                }}
+              >
+                {post.visibility ===
+                'adherant'
+                  ? '🔒 Article Adhérant'
+                  : '🌍 Article Public'}
+              </p>
+
+              {post.image_url && (
+                <img
+                  src={post.image_url}
+                  style={{
+                    width: '100%',
+                    borderRadius: '20px',
+                    marginTop: '20px',
+                  }}
+                />
+              )}
+
+              {post.youtube_url && (
+                <iframe
+                  width='100%'
+                  height='400'
+                  style={{
+                    marginTop: '20px',
+                    borderRadius: '20px',
+                  }}
+                  src={post.youtube_url.replace(
+                    'watch?v=',
+                    'embed/'
+                  )}
+                />
+              )}
+
+              <button
+                onClick={() =>
+                  deletePost(post.id)
+                }
+                style={{
+                  marginTop: '20px',
+                  background: '#e74c3c',
+                  border: 'none',
+                  padding: '12px 20px',
+                  borderRadius: '12px',
+                  color: 'white',
+                  cursor: 'pointer',
+                }}
+              >
+                Supprimer
+              </button>
+            </div>
+          ))}
+        </div>
+      </main>
+    </>
   )
 }
 
 const inputStyle = {
   width: '100%',
-  padding: '12px',
-  marginBottom: '15px',
-  borderRadius: '10px',
+  padding: '15px',
+  marginBottom: '20px',
+  borderRadius: '12px',
   border: '1px solid #333',
   background: '#222',
   color: 'white',
+  fontSize: '16px',
 }
 
 const buttonStyle = {
   width: '100%',
   padding: '15px',
-  border: 'none',
   borderRadius: '12px',
+  border: 'none',
   background: '#2ecc71',
   color: 'black',
   fontWeight: 'bold',
+  fontSize: '16px',
+  cursor: 'pointer',
 }
