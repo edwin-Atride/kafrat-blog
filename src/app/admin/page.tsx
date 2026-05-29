@@ -538,4 +538,3 @@ const buttonStyle = {
   fontSize: '16px',
   cursor: 'pointer',
 }
-```
