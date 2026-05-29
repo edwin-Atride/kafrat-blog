@@ -8,8 +8,10 @@ import Navbar from '../../components/Navbar'
 export default function Admin() {
   const router = useRouter()
 
-  const [authorized, setAuthorized] = useState(false)
+  const [authorized, setAuthorized] =
+    useState(false)
 
+  // BLOG
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [youtubeUrl, setYoutubeUrl] =
@@ -20,11 +22,27 @@ export default function Admin() {
   const [visibility, setVisibility] =
     useState('adherant')
 
-  const [posts, setPosts] = useState<any[]>([])
+  const [posts, setPosts] = useState<any[]>(
+    []
+  )
+
+  // HOME PAGE
+  const [heroTitle, setHeroTitle] =
+    useState('')
+
+  const [heroText, setHeroText] =
+    useState('')
+
+  const [youtubeHome, setYoutubeHome] =
+    useState('')
+
+  const [aboutText, setAboutText] =
+    useState('')
 
   useEffect(() => {
     checkAdmin()
     getPosts()
+    getHomeContent()
   }, [])
 
   async function checkAdmin() {
@@ -49,6 +67,35 @@ export default function Admin() {
     }
 
     setAuthorized(true)
+  }
+
+  async function getHomeContent() {
+    const { data } = await supabase
+      .from('home_content')
+      .select('*')
+      .eq('id', 1)
+      .single()
+
+    if (data) {
+      setHeroTitle(data.hero_title || '')
+      setHeroText(data.hero_text || '')
+      setYoutubeHome(data.youtube_url || '')
+      setAboutText(data.about_text || '')
+    }
+  }
+
+  async function updateHome() {
+    await supabase
+      .from('home_content')
+      .update({
+        hero_title: heroTitle,
+        hero_text: heroText,
+        youtube_url: youtubeHome,
+        about_text: aboutText,
+      })
+      .eq('id', 1)
+
+    alert('Accueil modifié')
   }
 
   async function uploadImage(file: File) {
@@ -134,20 +181,100 @@ export default function Admin() {
           style={{
             color: '#2ecc71',
             fontSize: '50px',
+            marginBottom: '40px',
           }}
         >
           Dashboard Admin
         </h1>
+
+        {/* HOME PAGE */}
 
         <div
           style={{
             background: '#111',
             padding: '30px',
             borderRadius: '20px',
-            marginTop: '40px',
             marginBottom: '50px',
           }}
         >
+          <h2
+            style={{
+              color: '#2ecc71',
+              marginBottom: '20px',
+            }}
+          >
+            Modifier l'accueil
+          </h2>
+
+          <input
+            placeholder='Titre accueil'
+            value={heroTitle}
+            onChange={(e) =>
+              setHeroTitle(e.target.value)
+            }
+            style={inputStyle}
+          />
+
+          <textarea
+            placeholder='Texte accueil'
+            value={heroText}
+            onChange={(e) =>
+              setHeroText(e.target.value)
+            }
+            style={{
+              ...inputStyle,
+              minHeight: '120px',
+            }}
+          />
+
+          <input
+            placeholder='Lien vidéo YouTube accueil'
+            value={youtubeHome}
+            onChange={(e) =>
+              setYoutubeHome(e.target.value)
+            }
+            style={inputStyle}
+          />
+
+          <textarea
+            placeholder='Présentation association'
+            value={aboutText}
+            onChange={(e) =>
+              setAboutText(e.target.value)
+            }
+            style={{
+              ...inputStyle,
+              minHeight: '120px',
+            }}
+          />
+
+          <button
+            onClick={updateHome}
+            style={buttonStyle}
+          >
+            Sauvegarder l'accueil
+          </button>
+        </div>
+
+        {/* BLOG */}
+
+        <div
+          style={{
+            background: '#111',
+            padding: '30px',
+            borderRadius: '20px',
+            marginBottom: '50px',
+          }}
+        >
+          <h2
+            style={{
+              color: '#2ecc71',
+              marginBottom: '20px',
+            }}
+          >
+            Créer un article
+          </h2>
+
           <input
             placeholder='Titre'
             value={title}
@@ -224,6 +351,8 @@ export default function Admin() {
           </button>
         </div>
 
+        {/* POSTS */}
+
         <div
           style={{
             display: 'grid',
@@ -287,6 +416,7 @@ export default function Admin() {
                   padding: '12px 20px',
                   borderRadius: '12px',
                   color: 'white',
+                  cursor: 'pointer',
                 }}
               >
                 Supprimer
