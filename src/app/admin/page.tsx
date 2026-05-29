@@ -1,3 +1,4 @@
+```tsx
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -12,6 +13,7 @@ export default function Admin() {
     useState(false)
 
   // BLOG
+
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [youtubeUrl, setYoutubeUrl] =
@@ -26,7 +28,8 @@ export default function Admin() {
     []
   )
 
-  // HOME PAGE
+  // HOME
+
   const [heroTitle, setHeroTitle] =
     useState('')
 
@@ -38,6 +41,9 @@ export default function Admin() {
 
   const [aboutText, setAboutText] =
     useState('')
+
+  const [homeImages, setHomeImages] =
+    useState<string[]>([])
 
   useEffect(() => {
     checkAdmin()
@@ -81,7 +87,42 @@ export default function Admin() {
       setHeroText(data.hero_text || '')
       setYoutubeHome(data.youtube_url || '')
       setAboutText(data.about_text || '')
+
+      setHomeImages([
+        data.image1 || '',
+        data.image2 || '',
+        data.image3 || '',
+        data.image4 || '',
+        data.image5 || '',
+      ])
     }
+  }
+
+  async function uploadHomeImage(
+    file: File,
+    index: number
+  ) {
+    const fileName =
+      Date.now() + '-' + file.name
+
+    const { error } = await supabase.storage
+      .from('images')
+      .upload(fileName, file)
+
+    if (error) {
+      alert(error.message)
+      return
+    }
+
+    const { data } = supabase.storage
+      .from('images')
+      .getPublicUrl(fileName)
+
+    const updated = [...homeImages]
+
+    updated[index] = data.publicUrl
+
+    setHomeImages(updated)
   }
 
   async function updateHome() {
@@ -92,6 +133,12 @@ export default function Admin() {
         hero_text: heroText,
         youtube_url: youtubeHome,
         about_text: aboutText,
+
+        image1: homeImages[0],
+        image2: homeImages[1],
+        image3: homeImages[2],
+        image4: homeImages[3],
+        image5: homeImages[4],
       })
       .eq('id', 1)
 
@@ -187,7 +234,7 @@ export default function Admin() {
           Dashboard Admin
         </h1>
 
-        {/* HOME PAGE */}
+        {/* HOME */}
 
         <div
           style={{
@@ -247,6 +294,46 @@ export default function Admin() {
               minHeight: '120px',
             }}
           />
+
+          <h3
+            style={{
+              color: '#2ecc71',
+              marginBottom: '20px',
+            }}
+          >
+            Images accueil (max 5)
+          </h3>
+
+          {[0, 1, 2, 3, 4].map((index) => (
+            <div key={index}>
+              <input
+                type='file'
+                onChange={(e) => {
+                  const file =
+                    e.target.files?.[0]
+
+                  if (file) {
+                    uploadHomeImage(
+                      file,
+                      index
+                    )
+                  }
+                }}
+                style={inputStyle}
+              />
+
+              {homeImages[index] && (
+                <img
+                  src={homeImages[index]}
+                  style={{
+                    width: '200px',
+                    borderRadius: '15px',
+                    marginBottom: '20px',
+                  }}
+                />
+              )}
+            </div>
+          ))}
 
           <button
             onClick={updateHome}
@@ -451,3 +538,4 @@ const buttonStyle = {
   fontSize: '16px',
   cursor: 'pointer',
 }
+```
