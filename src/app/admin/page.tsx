@@ -124,6 +124,12 @@ export default function Admin() {
     setHomeImages(updated)
   }
 
+  function removeHomeImage(index: number) {
+    const updated = [...homeImages]
+    updated[index] = ''
+    setHomeImages(updated)
+  }
+
   async function updateHome() {
     await supabase
       .from('home_content')
@@ -321,14 +327,31 @@ export default function Admin() {
               />
 
               {homeImages[index] && (
-                <img
-                  src={homeImages[index]}
-                  style={{
-                    width: '200px',
-                    borderRadius: '15px',
-                    marginBottom: '20px',
-                  }}
-                />
+                <>
+                  <img
+                    src={homeImages[index]}
+                    style={{
+                      width: '200px',
+                      borderRadius: '15px',
+                      marginBottom: '10px',
+                    }}
+                  />
+
+                  <button
+                    onClick={() => removeHomeImage(index)}
+                    style={{
+                      background: '#e74c3c',
+                      color: 'white',
+                      border: 'none',
+                      padding: '8px 12px',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      marginBottom: '20px',
+                    }}
+                  >
+                    Supprimer image
+                  </button>
+                </>
               )}
             </div>
           ))}
