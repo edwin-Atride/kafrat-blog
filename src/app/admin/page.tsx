@@ -93,7 +93,6 @@ export default function Admin() {
         data.image2 || '',
         data.image3 || '',
         data.image4 || '',
-        data.image5 || '',
       ])
     }
   }
@@ -138,7 +137,6 @@ export default function Admin() {
         image2: homeImages[1],
         image3: homeImages[2],
         image4: homeImages[3],
-        image5: homeImages[4],
       })
       .eq('id', 1)
 
@@ -301,10 +299,10 @@ export default function Admin() {
               marginBottom: '20px',
             }}
           >
-            Images accueil (max 5)
+            Images accueil (max 4)
           </h3>
 
-          {[0, 1, 2, 3, 4].map((index) => (
+          {[0, 1, 2, 3].map((index) => (
             <div key={index}>
               <input
                 type='file'
