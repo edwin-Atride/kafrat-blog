@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Navbar from '../components/Navbar'
 import { supabase } from '../lib/supabase'
+import './responsive.css'
 
 export default function Home() {
   const [content, setContent] = useState<any>(

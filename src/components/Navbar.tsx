@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import '../app/responsive.css'
 
 export default function Navbar() {
   const [user, setUser] = useState<any>(null)
@@ -48,7 +49,7 @@ export default function Navbar() {
   }
 
   return (
-    <nav
+    <nav className='navbar-responsive'
       style={{
         display: 'flex',
         justifyContent: 'space-between',
@@ -67,7 +68,7 @@ export default function Navbar() {
         Kafrat
       </h1>
 
-      <div
+      <div className='navbar-links'
         style={{
           display: 'flex',
           gap: '20px',

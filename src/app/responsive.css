@@ -1,0 +1,10 @@
+
+.navbar-responsive{display:flex;justify-content:space-between;align-items:center;padding:20px 40px;background:#000;border-bottom:1px solid #2ecc71;gap:15px}
+.navbar-links{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+@media (max-width:768px){
+.navbar-responsive{flex-direction:column;padding:15px}
+.navbar-links{justify-content:center}
+h1{word-break:break-word}
+iframe{height:250px!important}
+}
+img{max-width:100%;height:auto}
